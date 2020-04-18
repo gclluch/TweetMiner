@@ -1,2 +1,2 @@
 # TweetMiner
-Mines Twitter data for use in natural language processing
+Mines and optionally cleans Twitter data for use in natural language processing
