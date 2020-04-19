@@ -3,6 +3,7 @@ import pandas
 from nltk.tokenize import word_tokenize
 from string import punctuation
 from nltk.corpus import stopwords
+from nltk.stem.wordnet import WordNetLemmatizer
 
 
 class Processor():
@@ -19,7 +20,8 @@ class Processor():
         remove_hashtags=False,
         remove_punctuation=False,
         remove_stopwords=False,
-        to_lowercase=False
+        to_lowercase=False,
+        tokenize=False
     ):
 
         options = {
@@ -27,7 +29,8 @@ class Processor():
             'remove_hashtags': remove_hashtags,
             'remove_punctuation': remove_punctuation,
             'remove_stopwords': remove_stopwords,
-            'to_lowercase': to_lowercase
+            'to_lowercase': to_lowercase,
+            'tokenize': tokenize
         }
 
         tweets = tweets.apply(
@@ -42,6 +45,7 @@ class Processor():
         remove_punctuation = options.get('remove_punctuation')
         remove_stopwords = options.get('remove_stopwords')
         to_lowercase = options.get('to_lowercase')
+        tokenize = options.get('tokenize')
 
         row['processed_text'] = self._remove_URL(row['text'])
         row['processed_text'] = self._remove_hash(row['processed_text'])
@@ -54,10 +58,25 @@ class Processor():
             row['processed_text'] = self._remove_punctuation(
                 row['processed_text']
                 )
+        if remove_stopwords:
+            row['processed_text'] = self._remove_stopwords(
+                row['processed_text']
+                )
 
-        row['processed_text'] = self._remove_stopwords(row['processed_text'])
+        if tokenize:
+            row['processed_text'] = self._tokenize(row['processed_text'])
+
+        if normalize:
+            row['processed_text'] = self._normalize(row['processed_text'])
 
         return row
+
+    def _normalize(self, text):
+        lem = WordNetLemmatizer()
+        return ' '.join([lem.lemmatize(word, 'v') for word in text.split()])
+
+    def _tokenize(self, text):
+        return ' '.join(word_tokenize(text))
 
     def _remove_hash(self, text):
         return re.sub(r'#([^\s]+)', r'\1', text)
@@ -67,8 +86,7 @@ class Processor():
         return ''.join(nopunc)
 
     def _remove_stopwords(self, text):
-        return  ' '.join([word for word in text.split() if word not in self._stopwords])
-
+        return ' '.join([word for word in text.split() if word.lower() not in self._stopwords])
 
     def _remove_URL(self, text):
         return re.sub('((www\.[^r\s]+)|(https?://[^\rs]+))', 'URL', text)

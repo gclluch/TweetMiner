@@ -11,12 +11,16 @@ tm.set_criteria(query_text='#trump', limit=5)
 
 # tweets = tm.get_tweets()
 
-tweets = pd.read_csv('test2.csv')
-print(tweets.iloc[1]['text'])
+i = 1
+tweets = pd.read_csv('data/test2.csv')
+print(tweets.iloc[i]['text'])
 
 pr = Processor()
 processed_tweets = pr.process_tweets(
   tweets,
   to_lowercase=True,
-  remove_punctuation=True)
-print(processed_tweets.iloc[1]['processed_text'])
+  # remove_punctuation=True,
+  # normalize=True,
+  # tokenize=True
+  )
+print(processed_tweets.iloc[i]['processed_text'])
