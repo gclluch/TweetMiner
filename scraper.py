@@ -1,6 +1,7 @@
+import sys
 import codecs
+import pandas as pd
 import GetOldTweets3 as got
-import pandas
 
 
 class TweetMiner():
@@ -32,34 +33,31 @@ class TweetMiner():
         if username is not None:
             self.criteria = self.criteria.setUsername(username)
 
+        if list(self.criteria.__dict__.keys()) == [
+            'maxTweets',
+            'topTweets',
+            'within',
+            'emoji'
+                ]:
+            print('No criteria options supplied.')
+            print('Available Criteria:')
+            print('\tquery_text(str)')
+            print('\tlimit(int)')
+            print('\tsince(str)')
+            print('\tuntil(str)')
+            print('\tusername(str)')
+            sys.exit()
+
         return self
 
     def get_tweets(self, to_file=None):
         tweets = got.manager.TweetManager.getTweets(self.criteria)
+
+        tweet_df = pd.DataFrame(
+            list(map(lambda tweet: tweet.__dict__, tweets))
+            )
+
         if to_file is not None:
-            self.write_csv(to_file, tweets)
+            tweet_df.to_csv(to_file, index=False)
 
-        return tweets
-
-    def write_csv(self, to_file, tweets):
-        output_file = codecs.open(to_file, "w+", "utf-8")
-
-        output_file.write('username,date,retweets,favorites,text,geo,mentions,hashtags,id,permalink')
-
-        for t in tweets:
-            output_file.write(
-                ('\n%s,%s,%d,%d,"%s",%s,%s,%s,"%s",%s' %
-                 (t.username,
-                  t.date.strftime("%Y-%m-%d %H:%M"),
-                  t.retweets,
-                  t.favorites,
-                  t.text,
-                  t.geo,
-                  t.mentions,
-                  t.hashtags,
-                  t.id,
-                  t.permalink)))
-
-        output_file.flush()
-        print('%d raw tweets saved to file...\n' % len(tweets))
-        output_file.close()
+        return tweet_df
