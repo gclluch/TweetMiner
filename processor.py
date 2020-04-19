@@ -50,7 +50,12 @@ class Processor():
         if to_lowercase:
             row['processed_text'] = row['processed_text'].lower()
 
-        row['processed_text'] = self._remove_punctuation(row['processed_text'])
+        if remove_punctuation:
+            row['processed_text'] = self._remove_punctuation(
+                row['processed_text']
+                )
+
+        row['processed_text'] = self._remove_stopwords(row['processed_text'])
 
         return row
 
@@ -60,6 +65,10 @@ class Processor():
     def _remove_punctuation(self, text):
         nopunc = [char for char in text if char not in punctuation]
         return ''.join(nopunc)
+
+    def _remove_stopwords(self, text):
+        return  ' '.join([word for word in text.split() if word not in self._stopwords])
+
 
     def _remove_URL(self, text):
         return re.sub('((www\.[^r\s]+)|(https?://[^\rs]+))', 'URL', text)

@@ -17,5 +17,6 @@ print(tweets.iloc[1]['text'])
 pr = Processor()
 processed_tweets = pr.process_tweets(
   tweets,
-  to_lowercase=True)
+  to_lowercase=True,
+  remove_punctuation=True)
 print(processed_tweets.iloc[1]['processed_text'])
