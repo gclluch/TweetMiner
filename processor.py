@@ -10,7 +10,7 @@ class Processor():
 
     def __init__(self):
         self._stopwords = set(
-            stopwords.words('english') + list(punctuation) + ['AT_USER', 'URL']
+            stopwords.words('english') + list(punctuation)
             )
 
     def process_tweets(
